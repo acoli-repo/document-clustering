@@ -1,0 +1,22 @@
+# conda env update -f environment.yml
+name: document-clustering
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - pypdf
+  - pdfminer.six
+  - python-poppler
+  - pandas
+  - scikit-learn
+  - ipykernel
+  - regex
+  - matplotlib
+  - pip
+  - pip:
+    # - "--editable=git+https://github.com/glaserL/glassplitter.git#egg=glassplitter"
+    - "git+https://github.com/glaserL/glassplitter.git#egg=glassplitter"
+  - rich
+  - feedparser
+  - conllu
+  - numpy

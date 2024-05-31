@@ -1,0 +1,162 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "document-clustering"
+version = "0.2.0"
+description = 'Clustering documents according to document similarity, with a focus on scientific publications'
+readme = "README.md"
+requires-python = ">=3.9" # 3.9 Support wird für Neuron gebraucht
+license = "MIT"
+keywords = []
+authors = [
+  {name = "Leona Gottfried", email = "61663141+leogott@users.noreply.github.com"},
+  { name = "Center for Cognition and Computation (CCC) Frankfurt/Main" },
+  { name = "Lehrstuhl für Angewandte Computerlinguistik (ACoLi) Augsburg" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "feedparser",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "glassplitter @ git+https://github.com/glaserL/glassplitter.git#egg=glassplitter", # WIP
+  "python-poppler",
+  "rich",
+]
+
+[project.optional-dependencies]
+tests = [
+  "nox",
+  "pytest",
+  "pytest-cov",
+]
+pdf = [
+  "python-poppler",
+]
+cli = [
+  "rich",
+  "tqdm",
+]
+
+[project.urls]
+Documentation = "https://github.com/unknown/document-clustering#readme"
+Issues = "https://github.com/unknown/document-clustering/issues"
+Source = "https://github.com/unknown/document-clustering"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/",
+  "tests/",
+  "doc/"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/document_clustering"]
+
+[tool.coverage.paths]
+document_clustering = ["src/document_clustering", "*/document-clustering/src/document_clustering"]
+tests = ["tests", "*/document-clustering/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.coverage.run]
+source_pkgs = ["document_clustering", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/document_clustering/__about__.py",
+  "tests/*",
+]
+
+# [[tool.hatch.envs.all.matrix]]
+# python = ["3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/document_clustering tests}"
+
+[tool.hatch.metadata]
+allow-direct-references = true # DEBUG
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)4s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%H:%M:%S"
+log_file = "pytest.log"
+log_file_level = "DEBUG"
+log_file_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_file_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.ruff]
+include = ["pyproject.toml", "src/**/*.py", "src/**/*.ipynb"]
+
+[tool.ruff.format]
+preview = true
+
+[tool.ruff.lint]
+preview = true
+ignore = []
+extend-select = [
+  "ARG",
+  "F",
+  "C901", # McCabe complexity
+  "TD",
+  "ANN",
+  "D",
+  "FIX",
+]
+extend-ignore = [
+  "EM101", # Fix upstream
+  "G004", # Logging-f-string
+  "S403", # While shelve may be insecure, we're not loading arbirtary files
+  "TRY003",
+  "D100",
+  "D104", "TD003", # TODO @leogott: These should be fixed eventually, but are low prio
+  "ANN202",
+  "ANN204",
+  "TCH002", "TCH003", # I don't understand the implications
+  "RET504",
+  "UP007", # slight disagree
+]
+[tool.ruff.lint.extend-per-file-ignores]
+"*.ipynb" = ["T2", "ANN", "D"]
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
